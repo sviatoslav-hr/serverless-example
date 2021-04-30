@@ -1,0 +1,19 @@
+{
+  "name": "tasks-serverless",
+  "version": "1.0.0",
+  "description": "Test serverless project",
+  "main": "handler.js",
+  "scripts": {
+    "deploy-dev": "serverless deploy --stage dev"
+  },
+  "author": "Sviatoslav Khrystyna",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.896.0",
+    "http-status-codes": "^2.1.4",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "serverless-pseudo-parameters": "^2.5.0"
+  }
+}

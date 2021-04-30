@@ -1,0 +1,72 @@
+service: tasks-crud
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+
+  environment:
+    DYNAMODB_TASKS_TABLE: ${self:service}-tasks-${opt:stage}
+
+  iam:
+    role:
+      statements:
+        - Effect: 'Allow'
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:Scan*
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-tasks-${opt:stage}"
+
+plugins:
+  # this plugin gives access to use some complex variables, as in provider.iam.role.statements.Resource
+  - serverless-pseudo-parameters
+
+functions:
+  create:
+    handler: handler.create
+    events:
+      - http:
+          path: /v1/task
+          method: post
+  list:
+    handler: handler.list
+    events:
+      - http:
+          path: /v1/task
+          method: get
+  get:
+    handler: handler.get
+    events:
+      - http:
+          path: /v1/task/{id}
+          method: get
+  update:
+    handler: handler.update
+    events:
+      - http:
+          path: /v1/task/{id}
+          method: put
+  delete:
+    handler: handler.delete
+    events:
+      - http:
+          path: /v1/task/{id}
+          method: delete
+
+resources:
+  Resources:
+    tasksTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: ${self:service}-tasks-${opt:stage}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
